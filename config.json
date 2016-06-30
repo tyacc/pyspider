@@ -1,0 +1,16 @@
+{
+    "prefix": "s1_",
+    "taskdb": "mongodb+taskdb://localhost/pyspider_taskdb",
+    "projectdb": "mongodb+projectdb://localhost/pyspider_projectdb",
+    "resultdb": "mongodb+resultdb://localhost/pyspider_resultdb",
+    "amqp_url": "amqp://guest:guest@localhost/pyspider_host",
+    "webui": {
+        "port": 6001
+    },
+    "phantomjs": {
+        "port": 25556
+    },
+    "scheduler": {
+        "xmlrpc_port": 23334
+    }
+}

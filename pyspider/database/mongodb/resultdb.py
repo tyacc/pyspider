@@ -15,7 +15,7 @@ from .mongodbbase import SplitTableMixin
 class ResultDB(SplitTableMixin, BaseResultDB):
     collection_prefix = ''
 
-    def __init__(self, url, database='resultdb'):
+    def __init__(self, url, database='resultdb', prefix=''):
         self.conn = MongoClient(url)
         self.conn.admin.command("ismaster")
         self.database = self.conn[database]

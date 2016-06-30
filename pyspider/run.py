@@ -21,6 +21,8 @@ from pyspider.message_queue import connect_message_queue
 from pyspider.database import connect_database
 from pyspider.libs import utils
 
+prefix = ''
+
 
 def read_config(ctx, param, value):
     if not value:
@@ -40,7 +42,7 @@ def read_config(ctx, param, value):
 def connect_db(ctx, param, value):
     if not value:
         return
-    return utils.Get(lambda: connect_database(value))
+    return utils.Get(lambda: connect_database(value, prefix))
 
 
 def load_cls(ctx, param, value):
@@ -96,6 +98,10 @@ def cli(ctx, **kwargs):
 
     logging.config.fileConfig(kwargs['logging_config'])
 
+    # add by xrz: process prefix
+    global prefix
+    prefix = kwargs.get('config', {}).get('prefix', '')
+
     # get db from env
     for db in ('taskdb', 'projectdb', 'resultdb'):
         if kwargs[db] is not None:
@@ -109,7 +115,7 @@ def cli(ctx, **kwargs):
             kwargs[db] = utils.Get(lambda db=db: connect_database(
                 'mongodb+%s://%s:%s/%s' % (
                     db, os.environ['MONGODB_PORT_27017_TCP_ADDR'],
-                    os.environ['MONGODB_PORT_27017_TCP_PORT'], db)))
+                    os.environ['MONGODB_PORT_27017_TCP_PORT'], db), prefix))
         elif ctx.invoked_subcommand == 'bench':
             if kwargs['data_path'] == './data':
                 kwargs['data_path'] += '/bench'
@@ -144,11 +150,12 @@ def cli(ctx, **kwargs):
 
     for name in ('newtask_queue', 'status_queue', 'scheduler2fetcher',
                  'fetcher2processor', 'processor2result'):
+
         if kwargs.get('message_queue'):
             kwargs[name] = utils.Get(lambda name=name: connect_message_queue(
-                name, kwargs.get('message_queue'), kwargs['queue_maxsize']))
+                prefix+name, kwargs.get('message_queue'), kwargs['queue_maxsize']))
         else:
-            kwargs[name] = connect_message_queue(name, kwargs.get('message_queue'),
+            kwargs[name] = connect_message_queue(prefix+name, kwargs.get('message_queue'),
                                                  kwargs['queue_maxsize'])
 
     # phantomjs-proxy

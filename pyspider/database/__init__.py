@@ -8,7 +8,7 @@
 from six.moves.urllib.parse import urlparse, parse_qs
 
 
-def connect_database(url):
+def connect_database(url, prefix=''):
     """
     create database object by url
 
@@ -41,12 +41,12 @@ def connect_database(url):
         resultdb
 
     """
-    db = _connect_database(url)
-    db.copy = lambda: _connect_database(url)
+    db = _connect_database(url, prefix)
+    db.copy = lambda: _connect_database(url, prefix)
     return db
 
 
-def _connect_database(url):  # NOQA
+def _connect_database(url, prefix):  # NOQA
     parsed = urlparse(url)
 
     scheme = parsed.scheme.split('+')
@@ -107,7 +107,7 @@ def _connect_database(url):  # NOQA
             raise LookupError
     elif engine == 'mongodb':
         url = url.replace(parsed.scheme, 'mongodb')
-        parames = {}
+        parames = {'prefix': prefix}
         if parsed.path.strip('/'):
             parames['database'] = parsed.path.strip('/')
 

@@ -16,7 +16,8 @@ from .mongodbbase import SplitTableMixin
 class TaskDB(SplitTableMixin, BaseTaskDB):
     collection_prefix = ''
 
-    def __init__(self, url, database='taskdb'):
+    def __init__(self, url, database='taskdb', prefix=''):
+        self.collection_prefix = prefix
         self.conn = MongoClient(url)
         self.conn.admin.command("ismaster")
         self.database = self.conn[database]
